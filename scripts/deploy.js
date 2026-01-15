@@ -1,14 +1,17 @@
+import pkg from "hardhat";
+const { ethers } = pkg;
+
 async function main() {
   const [deployer] = await ethers.getSigners();
 
   console.log("Deploying with:", deployer.address);
 
   const FactMarket = await ethers.getContractFactory("FactMarket");
-  const contract = await FactMarket.deploy(deployer.address);
+  const market = await FactMarket.deploy(deployer.address);
 
-  await contract.waitForDeployment();
+  await market.waitForDeployment();
 
-  console.log("FactMarket deployed to:", await contract.getAddress());
+  console.log("FactMarket deployed to:", await market.getAddress());
 }
 
 main().catch((error) => {

@@ -12,6 +12,8 @@ import {
   getBalance
 } from './contract'
 
+import { fetchFacts } from "./NewsAPI";
+
 export default function App() {
   const [wallet, setWallet] = useState(null)
   const [balance, setBalance] = useState(0)

@@ -103,72 +103,89 @@ export default function App() {
   }
 
   return (
-    <div style={{ padding: 40, fontFamily: 'Arial, sans-serif' }}>
-      <h1>🧠 Fact Check Market</h1>
+    <div className="app">
+      <div className="header">
+        <h1>🧠 Fact Check Market</h1>
 
-      {!wallet && <button onClick={connect}>Подключить MetaMask</button>}
-      {wallet && <p>Кошелек: {wallet}</p>}
-
-      {wallet && <p>Баланс: {balance} POL</p>}
-
-      <div style={{ marginTop: 20 }}>
-        <input
-          type="text"
-          placeholder="Введите новый факт"
-          value={newFact}
-          onChange={(e) => setNewFact(e.target.value)}
-          style={{ padding: 8, width: 300 }}
-        />
-        <button onClick={addFact} style={{ marginLeft: 8, padding: '8px 12px' }}>
-          Создать факт
-        </button>
+        {!wallet ? (
+          <button onClick={connect}>Connect MetaMask</button>
+        ) : (
+          <div className="wallet-box">
+            {wallet.slice(0, 6)}...{wallet.slice(-4)} | {balance} POL
+          </div>
+        )}
       </div>
 
-      <div style={{ marginTop: 40 }}>
-        {claims &&
-          claims.map((c) => {
-            const total = parseFloat(c.trueShares) + parseFloat(c.falseShares)
-            const truePercent = total ? Math.round((parseFloat(c.trueShares) / total) * 100) : 0
-            const falsePercent = total ? Math.round((parseFloat(c.falseShares) / total) * 100) : 0
+      {wallet && (
+        <div style={{ marginBottom: 30 }}>
+          <input
+            placeholder="Введите новый факт"
+            value={newFact}
+            onChange={(e) => setNewFact(e.target.value)}
+          />
+          <button onClick={addFact} style={{ marginLeft: 10 }}>
+            Создать факт
+          </button>
+        </div>
+      )}
 
-            return (
-              <div
-                key={c.id}
-                style={{
-                  border: '1px solid #ccc',
-                  borderRadius: 12,
-                  padding: 16,
-                  marginBottom: 12,
-                }}
-              >
-                <p><b>{c.description}</b></p>
-                <p>Вероятность: TRUE {truePercent}%, FALSE {falsePercent}%</p>
+      {claims &&
+        claims.map((c) => {
+          const total = c.trueShares + c.falseShares
+          const truePercent = total ? Math.round((c.trueShares / total) * 100) : 0
+          const falsePercent = 100 - truePercent
 
-                {!c.resolved && (
-                  <>
-                    <button onClick={() => vote(c.id, 'true')} style={{ marginRight: 8 }}>
-                      Ставка TRUE
-                    </button>
-                    <button onClick={() => vote(c.id, 'false')}>Ставка FALSE</button>
-                    {/* <button onClick={() => resolveFact(c.id, true)} style={{ marginLeft: 8 }}>
-                      Resolve TRUE
-                    </button>
-                    <button onClick={() => resolveFact(c.id, false)} style={{ marginLeft: 8 }}>
-                      Resolve FALSE
-                    </button> */}
-                  </>
-                )}
+          return (
+            <div className="card" key={c.id}>
+              <div className="fact-title">{c.description}</div>
 
-                {c.resolved && (
-                  <>
-                    <p>✅ Результат: {c.outcome ? 'TRUE' : 'FALSE'}</p>
-                    <button onClick={() => claim(c.id)}>Claim Payout</button>
-                  </>
-                )}
+              <div className="progress">
+                <div className="progress-inner">
+                  <div
+                    className="true-bar"
+                    style={{ width: `${truePercent}%` }}
+                  />
+                  <div
+                    className="false-bar"
+                    style={{ width: `${falsePercent}%` }}
+                  />
+                </div>
               </div>
-            )
-          })}
-      </div>
+
+              <p>
+                TRUE {truePercent}% | FALSE {falsePercent}%
+              </p>
+
+              {!c.resolved ? (
+                <>
+                  <button onClick={() => vote(c.id, 'true')}>
+                    Vote TRUE
+                  </button>
+                  <button className="secondary" onClick={() => vote(c.id, 'false')}>
+                    Vote FALSE
+                  </button>
+                  <button
+                    className="secondary"
+                    onClick={() => resolveFact(c.id, true)}
+                  >
+                    Resolve TRUE
+                  </button>
+                  <button
+                    className="danger"
+                    onClick={() => resolveFact(c.id, false)}
+                  >
+                    Resolve FALSE
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p>✅ Result: {c.outcome ? 'TRUE' : 'FALSE'}</p>
+                  <button onClick={() => claim(c.id)}>Claim payout</button>
+                </>
+              )}
+            </div>
+          )
+        })}
     </div>
   )
 }

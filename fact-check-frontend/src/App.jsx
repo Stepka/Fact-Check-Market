@@ -105,7 +105,7 @@ export default function App() {
   return (
     <div className="app">
       <div className="header">
-        <h1>🧠 Fact Check Market</h1>
+        <img src="/logo.svg" alt="Fact-Checking Market Logo" width={300} />
 
         {!wallet ? (
           <button onClick={connect}>Connect MetaMask</button>
